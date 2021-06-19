@@ -1,53 +1,93 @@
 <template>
-<div class="q-pa-md" style="max-width: 400px">
-
-    <q-form
-      @submit="onSubmit"
-      class="q-gutter-md"
+  <q-page padding>
+  <q-table
+      title="Data Kegiatan"
+      :data="data"
+      :columns="columns"
+      row-key="namakegiatan"
     >
-      <q-input
-        filled
-        v-model="form.namakegiatan"
-        label="Nama kegiatan"
-        :rules="[ val => val && val.length > 0 || 'Mohon isi nama kegiatan']"
-      />
-      <q-input
-        filled
-        v-model="form.deskripsi"
-        label="Deskripsi Kegiatan"
-        :rules="[ val => val && val.length > 0 || 'Mohon isi deskripsi kegiatan']"
-      />
-      <q-input
-        filled
-        v-model="form.waktu"
-        label="waktu Kegiatan"
-        :rules="[ val => val && val.length > 0 || 'Mohon isi waktu kegiatan']"
-      />
-
-      <div>
-        <q-btn label="Submit" type="submit" color="primary"/>
-      </div>
-    </q-form>
-
-  </div>
+      <template v-slot:top-right>
+        <q-btn
+          icon="add_box"
+          label="Input Kegiatan"
+          unelevated
+          color="primary"
+          :to="{ name:'inputKegiatan' }"
+        />
+      </template>
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td key="namakegiatan" :props="props">
+            {{ props.row.namakegiatan }}
+          </q-td>
+          <q-td key="deskripsi" :props="props">
+            {{ props.row.deskripsi }}
+          </q-td>
+          <q-td key="waktu" :props="props">
+            {{ props.row.waktu }}
+          </q-td>
+          <q-td key="aksi" :props="props">
+            <q-btn
+              label = "Edit"
+              icon = "edit"
+              color = "warning"
+              unelevated
+            />
+            <q-btn
+              label = "Hapus"
+              icon = "delete"
+              color = "negative"
+              class = "q-ml-md"
+              unelevated
+            />
+          </q-td>
+        </q-tr>
+      </template>
+    </q-table>
+  </q-page>
 </template>
-<script>
 
+<script>
 export default {
   data () {
     return {
-      form: {
-        namakegiatan: null,
-        deskripsi: null,
-        waktu: null
-      }
+      columns: [
+        {
+          name: 'namakegiatan',
+          align: 'left',
+          label: 'nama Kegiatan',
+          field: 'namakegiatan'
+        },
+        {
+          name: 'deskripsi',
+          align: 'left',
+          label: 'Deskripsi',
+          field: 'deskripsi'
+        },
+        {
+          name: 'waktu',
+          align: 'left',
+          label: 'Waktu',
+          field: 'waktu'
+        },
+        {
+          name: 'aksi',
+          align: 'left',
+          label: 'Aksi',
+          field: 'aksi'
+        }
+      ],
+      data: []
     }
   },
+  created () {
+    this.getData()
+  },
   methods: {
-    onSubmit () {
-      this.$axios.post('kegiatan/insert', this.form)
+    getData () {
+      this.$axios.get('kegiatan/getall')
         .then(res => {
-          console.log(res)
+          this.data = res.data.result
         })
     }
   }
